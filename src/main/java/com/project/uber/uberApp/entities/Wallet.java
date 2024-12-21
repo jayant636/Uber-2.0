@@ -5,31 +5,27 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.locationtech.jts.geom.Point;
+
+import java.util.List;
 
 @Entity
-@Table(name = "driver")
+@Table(name = "wallet")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Driver {
+public class Wallet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
     private User user;
 
-    private Double rating;
+    private Double balance;
 
-    private Boolean available;
-
-    @Column(columnDefinition = "Geometry(Point , 4326)")
-    Point currentLocation;
-
-
-
+    //One wallet can have many wallet Transaction
+    @OneToMany(mappedBy = "wallet",fetch = FetchType.LAZY)
+    private List<WalletTransaction> transactions;
 }
