@@ -12,6 +12,7 @@ import com.project.uber.uberApp.services.RiderService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -29,6 +30,8 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+//    Either everything will be implemented or nothing
+    @Transactional
     public UserDto signup(SignupDto signupDto) {
 
         //Checking existing user
@@ -40,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
 
         //All the things that needs to created for user will be done here
         User user = modelMapper.map(signupDto, User.class);
-        //By default any user signup as rider only
+        //By default any user signedup as rider only
         user.setRoles(Set.of(Roles.RIDER));
         User savedUser = userRespository.save(user);
 
