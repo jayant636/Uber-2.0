@@ -26,6 +26,7 @@ public class RideDto {
     //when driver accepts your ride
     private LocalDateTime createdTime;
 
+    private String otp;
 
     private RiderDto riderDto;
 
