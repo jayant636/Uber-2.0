@@ -8,11 +8,13 @@ import com.project.uber.uberApp.entities.RideRequest;
 import com.project.uber.uberApp.entities.Rider;
 import com.project.uber.uberApp.entities.User;
 import com.project.uber.uberApp.entities.enums.RideRequestStatus;
+import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.RideRequestRepository;
 import com.project.uber.uberApp.repositories.RiderRepository;
 import com.project.uber.uberApp.services.RiderService;
 import com.project.uber.uberApp.strategies.DriverMatchingStrategy;
 import com.project.uber.uberApp.strategies.RideFareCalculationStrategy;
+import com.project.uber.uberApp.strategies.RideStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,15 +27,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RiderServiceImpl implements RiderService {
 
-    private final  DriverMatchingStrategy driverMatchingStrategy;
-    private final RideFareCalculationStrategy rideFareCalculationStrategy;
     private final ModelMapper modelMapper;
     private final RideRequestRepository rideRequestRepository;
     private final RiderRepository riderRepository;
+    private final RideStrategyManager rideStrategyManager;
 
     @Override
     public RideRequestDto requestRide(RideRequestDto rideRequestDto) {
-//       Converting dto  to entity
+
+        Rider rider = getCurrentRider();
+
+        //       Converting dto  to entity
         RideRequest rideRequest = modelMapper.map(rideRequestDto, RideRequest.class);
 
         //Setting ride request status in entity
@@ -41,7 +45,7 @@ public class RiderServiceImpl implements RiderService {
 
         //Calculate the fare from the method of service
         //Strategy to calculate fare
-        Double fare = rideFareCalculationStrategy.calculateFare(rideRequest);
+        Double fare = rideStrategyManager.rideFareCalculationStrategy().calculateFare(rideRequest);
 
         //Setting calculated fare in the entity
         rideRequest.setFare(fare);
@@ -51,7 +55,7 @@ public class RiderServiceImpl implements RiderService {
         RideRequest rideRequest1 = rideRequestRepository.save(rideRequest);
 
 //        Search for driver
-        driverMatchingStrategy.findMatchingDriver(rideRequest);
+        rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDriver(rideRequest);
 
         return modelMapper.map(rideRequest1, RideRequestDto.class);
     }
@@ -87,5 +91,11 @@ public class RiderServiceImpl implements RiderService {
                .build();
 
        return riderRepository.save(rider);
+    }
+
+    @Override
+    public Rider getCurrentRider() {
+//        TODO : Implement Spring Security
+        return riderRepository.findById(1L).orElseThrow(()-> new ResourceNotFoundException("Rider not found"));
     }
 }

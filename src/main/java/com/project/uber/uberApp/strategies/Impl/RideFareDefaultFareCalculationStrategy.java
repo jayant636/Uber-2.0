@@ -1,6 +1,5 @@
 package com.project.uber.uberApp.strategies.Impl;
 
-import com.project.uber.uberApp.dtos.RideRequestDto;
 import com.project.uber.uberApp.entities.RideRequest;
 import com.project.uber.uberApp.services.DistanceService;
 import com.project.uber.uberApp.strategies.RideFareCalculationStrategy;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RiderFareDefaultFareCalculationStrategy implements RideFareCalculationStrategy {
+public class RideFareDefaultFareCalculationStrategy implements RideFareCalculationStrategy {
 
     private final DistanceService distanceService;
 
