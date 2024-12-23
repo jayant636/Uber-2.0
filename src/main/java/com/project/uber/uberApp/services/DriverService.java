@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DriverService {
 
-    RideDto cancelRide(Long rideId);
+    RideDto cancelRide(Long rideRequestId);
 
     RideDto startRide(Long rideId);
 

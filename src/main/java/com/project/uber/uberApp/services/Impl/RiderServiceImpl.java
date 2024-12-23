@@ -4,6 +4,7 @@ import com.project.uber.uberApp.dtos.DriverDto;
 import com.project.uber.uberApp.dtos.RideDto;
 import com.project.uber.uberApp.dtos.RideRequestDto;
 import com.project.uber.uberApp.dtos.RiderDto;
+import com.project.uber.uberApp.entities.Driver;
 import com.project.uber.uberApp.entities.RideRequest;
 import com.project.uber.uberApp.entities.Rider;
 import com.project.uber.uberApp.entities.User;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +35,8 @@ public class RiderServiceImpl implements RiderService {
     private final RideStrategyManager rideStrategyManager;
 
     @Override
+//    This will make sure that either all the transaction should happen or nothing would happen
+    @Transactional
     public RideRequestDto requestRide(RideRequestDto rideRequestDto) {
 
         Rider rider = getCurrentRider();
@@ -40,8 +44,9 @@ public class RiderServiceImpl implements RiderService {
         //       Converting dto  to entity
         RideRequest rideRequest = modelMapper.map(rideRequestDto, RideRequest.class);
 
-        //Setting ride request status in entity
+        //Setting ride request status & rider in entity
         rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
+        rideRequest.setRider(rider);
 
         //Calculate the fare from the method of service
         //Strategy to calculate fare
@@ -55,7 +60,8 @@ public class RiderServiceImpl implements RiderService {
         RideRequest rideRequest1 = rideRequestRepository.save(rideRequest);
 
 //        Search for driver
-        rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDriver(rideRequest);
+        List<Driver> drivers =  rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDriver(rideRequest);
+//    TODO : Send notification to all the drivers about this ride request
 
         return modelMapper.map(rideRequest1, RideRequestDto.class);
     }
