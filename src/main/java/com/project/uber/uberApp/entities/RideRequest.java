@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.Point;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ride_requests")
 @Getter
 @Setter
 @NoArgsConstructor

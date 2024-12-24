@@ -13,8 +13,6 @@ import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.RideRequestRepository;
 import com.project.uber.uberApp.repositories.RiderRepository;
 import com.project.uber.uberApp.services.RiderService;
-import com.project.uber.uberApp.strategies.DriverMatchingStrategy;
-import com.project.uber.uberApp.strategies.RideFareCalculationStrategy;
 import com.project.uber.uberApp.strategies.RideStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

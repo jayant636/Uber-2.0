@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +24,7 @@ public class RideRequestDto {
 
     private LocalDateTime requestedTime;
 
-    private RiderDto riderDto;
+    private RiderDto rider;
 
     private Double fare;
 

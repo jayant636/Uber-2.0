@@ -19,18 +19,18 @@ public class RideDto {
 
     private Long id;
 
-    private Point pickupLocation;
+    private PointDto pickupLocation;
 
-    private Point dropoffLocation;
+    private PointDto dropoffLocation;
 
     //when driver accepts your ride
     private LocalDateTime createdTime;
 
     private String otp;
 
-    private RiderDto riderDto;
+    private RiderDto rider;
 
-    private DriverDto driverDto;
+    private DriverDto driver;
 
     private PaymentMethod paymentMethod;
 

@@ -14,8 +14,8 @@ public class MapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper mapper = new ModelMapper();
 
-        mapper.typeMap(PointDto.class, Point.class).setConverter(converter -> {
-            PointDto pointDto = converter.getSource();
+        mapper.typeMap(PointDto.class, Point.class).setConverter(context -> {
+            PointDto pointDto = context.getSource();
             return GeometryUtil.createPoint(pointDto);
         });
 
