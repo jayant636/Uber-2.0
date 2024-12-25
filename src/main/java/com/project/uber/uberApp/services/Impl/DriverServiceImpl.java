@@ -11,6 +11,7 @@ import com.project.uber.uberApp.entities.enums.RideStatus;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.DriverRepository;
 import com.project.uber.uberApp.services.DriverService;
+import com.project.uber.uberApp.services.PaymentService;
 import com.project.uber.uberApp.services.RideRequestService;
 import com.project.uber.uberApp.services.RideService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DriverServiceImpl implements DriverService {
 
+    private final PaymentService paymentService;
     private final ModelMapper modelMapper;
     private final RideService rideService;
     private final RideRequestService rideRequestService;
@@ -80,13 +82,38 @@ public class DriverServiceImpl implements DriverService {
 
        ride.setStartedAt(LocalDateTime.now());
        Ride savedRide =  rideService.updateRideStatus(ride,RideStatus.ONGOING);
+
+       paymentService.createdNewpayment(savedRide);
+
        return modelMapper.map(savedRide, RideDto.class);
 
     }
 
     @Override
+    @Transactional
     public RideDto endRide(Long rideId) {
-        return null;
+        //       fetch the ride from db
+        Ride ride = rideService.getRideById(rideId);
+
+//       fetch currentDriver
+        Driver driver = getCurrentDriver();
+//       if current driver is same aas ride driver then we should continue
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver cannot start ride as he has not accepted it earlier");
+        }
+
+//       Check ride status
+        if(!ride.getRideStatus().equals(RideStatus.ONGOING)){
+            throw new RuntimeException("Ride status is not Ongoing hance cannot be ended , status:"+ride.getRideStatus());
+        }
+
+        ride.setEndedAt(LocalDateTime.now());
+        Ride savedRide = rideService.updateRideStatus(ride,RideStatus.ENDED);
+        updateDriverAvailability(driver,true);
+
+        paymentService.processPayment(ride);
+
+        return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override
@@ -129,7 +156,7 @@ public class DriverServiceImpl implements DriverService {
     public Page<RideDto> getAllMyRides(PageRequest pageRequest) {
        Driver currentDriver = getCurrentDriver();
 //     using map we can convert one page to another page
-       return rideService.getAllRidesOfDriver(currentDriver.getId(),pageRequest).map(
+       return rideService.getAllRidesOfDriver(currentDriver,pageRequest).map(
                ride -> modelMapper.map(ride, RideDto.class)
        );
     }

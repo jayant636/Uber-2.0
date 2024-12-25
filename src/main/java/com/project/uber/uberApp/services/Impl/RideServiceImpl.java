@@ -4,6 +4,7 @@ import com.project.uber.uberApp.dtos.RideRequestDto;
 import com.project.uber.uberApp.entities.Driver;
 import com.project.uber.uberApp.entities.Ride;
 import com.project.uber.uberApp.entities.RideRequest;
+import com.project.uber.uberApp.entities.Rider;
 import com.project.uber.uberApp.entities.enums.RideRequestStatus;
 import com.project.uber.uberApp.entities.enums.RideStatus;
 import com.project.uber.uberApp.repositories.RideRepository;
@@ -55,13 +56,14 @@ public class RideServiceImpl implements RideService {
     }
 
     @Override
-    public Page<Ride> getAllRidesOfRider(Long riderId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfRider(Rider rider, PageRequest pageRequest) {
+        return rideRepository.findByRider(rider,pageRequest);
     }
 
     @Override
-    public Page<Ride> getAllRidesOfDriver(Long driverId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfDriver(Driver driver, PageRequest pageRequest) {
+
+        return rideRepository.findByDriver(driver,pageRequest);
     }
 
     private String generateRandomOTP(){

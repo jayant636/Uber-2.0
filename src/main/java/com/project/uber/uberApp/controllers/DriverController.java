@@ -24,4 +24,10 @@ public class DriverController {
 //        to get the otp from the driver we have created a separate dto
         return ResponseEntity.ok(driverService.startRide(rideRequestId,rideStartDto.getOtp()));
     }
+
+    @PostMapping(path = "/endRide/{rideId}")
+    public ResponseEntity<RideDto> endRide(@PathVariable Long rideId){
+//        to get the otp from the driver we have created a separate dto
+        return ResponseEntity.ok(driverService.endRide(rideId));
+    }
 }

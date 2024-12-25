@@ -105,7 +105,7 @@ public class RiderServiceImpl implements RiderService {
     public Page<RideDto> getAllMyRides(PageRequest pageRequest) {
         Rider rider = getCurrentRider();
 //     using map we can convert one page to another page
-        return rideService.getAllRidesOfRider(rider.getId(),pageRequest).map(
+        return rideService.getAllRidesOfRider(rider,pageRequest).map(
                 ride -> modelMapper.map(ride, RideDto.class)
         );
     }
