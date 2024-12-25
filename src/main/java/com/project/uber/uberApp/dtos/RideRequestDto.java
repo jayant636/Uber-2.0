@@ -24,6 +24,7 @@ public class RideRequestDto {
 
     private LocalDateTime requestedTime;
 
+    //    Make sure that you should use correct alias for UserDto that would match UserEntity alias i.e user -> in both dto & entity class
     private RiderDto rider;
 
     private Double fare;

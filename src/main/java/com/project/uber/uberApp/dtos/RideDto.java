@@ -28,8 +28,10 @@ public class RideDto {
 
     private String otp;
 
+    //Make sure that you should use correct alias for UserDto that would match UserEntity alias i.e user -> in both dto & entity class
     private RiderDto rider;
 
+    //Make sure that you should use correct alias for UserDto that would match UserEntity alias i.e user -> in both dto & entity class
     private DriverDto driver;
 
     private PaymentMethod paymentMethod;
