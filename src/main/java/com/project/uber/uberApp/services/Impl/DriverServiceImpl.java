@@ -6,14 +6,12 @@ import com.project.uber.uberApp.dtos.RiderDto;
 import com.project.uber.uberApp.entities.Driver;
 import com.project.uber.uberApp.entities.Ride;
 import com.project.uber.uberApp.entities.RideRequest;
+import com.project.uber.uberApp.entities.Rider;
 import com.project.uber.uberApp.entities.enums.RideRequestStatus;
 import com.project.uber.uberApp.entities.enums.RideStatus;
 import com.project.uber.uberApp.exceptions.ResourceNotFoundException;
 import com.project.uber.uberApp.repositories.DriverRepository;
-import com.project.uber.uberApp.services.DriverService;
-import com.project.uber.uberApp.services.PaymentService;
-import com.project.uber.uberApp.services.RideRequestService;
-import com.project.uber.uberApp.services.RideService;
+import com.project.uber.uberApp.services.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -29,6 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DriverServiceImpl implements DriverService {
 
+    private final RatingService ratingService;
     private final PaymentService paymentService;
     private final ModelMapper modelMapper;
     private final RideService rideService;
@@ -84,7 +83,7 @@ public class DriverServiceImpl implements DriverService {
        Ride savedRide =  rideService.updateRideStatus(ride,RideStatus.ONGOING);
 
        paymentService.createdNewpayment(savedRide);
-
+       ratingService.createNewRating(savedRide);
        return modelMapper.map(savedRide, RideDto.class);
 
     }
@@ -143,7 +142,20 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDto rateRider(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = getCurrentDriver();
+        // if current driver is same aas ride driver then we should continue
+        if(!driver.equals(ride.getDriver())){
+            throw new RuntimeException("Driver cannot rate rider as he was not owner of the ride");
+        }
+
+//        if ride is confirmed you cannot cancel it
+        if(ride.getRideStatus().equals(RideStatus.CONFIRMED)){
+            throw new RuntimeException("Ride is not ended hence cannot rate a ride"+ride.getRideStatus());
+        }
+
+       return ratingService.rateRider(ride,rating);
+
     }
 
     @Override
