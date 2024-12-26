@@ -38,7 +38,7 @@ public class User implements UserDetails {
 
 
     //This will create another table specifically for roles only
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     //It'll tell hibernate that we are storing the role as it is
     @Enumerated(EnumType.STRING)
     private Set<Roles> roles;

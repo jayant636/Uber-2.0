@@ -41,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
+
     @Override
     public String[] login(String email, String password) {
 
@@ -106,5 +107,12 @@ public class AuthServiceImpl implements AuthService {
         Driver savedDriver =  driverService.createNewDriver(createDriver);
         return modelMapper.map(savedDriver, DriverDto.class);
 
+    }
+
+    @Override
+    public String refreshToken(String refreshToken) {
+       Long userId = jwtService.getUserIdFromToken(refreshToken);
+       User user = userRespository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found with this userId:"+userId));
+       return jwtService.generateAccessToken(user);
     }
 }

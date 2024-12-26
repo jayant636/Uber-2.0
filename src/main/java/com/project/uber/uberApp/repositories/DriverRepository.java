@@ -1,12 +1,14 @@
 package com.project.uber.uberApp.repositories;
 
 import com.project.uber.uberApp.entities.Driver;
+import com.project.uber.uberApp.entities.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 //Custom method
 //ST_Distance(point1 , point2) - It will calculate the distance between two points
@@ -34,4 +36,5 @@ public interface DriverRepository extends JpaRepository<Driver,Long> {
     List<Driver> findTenNearByTopRatedDrivers(Point pickupLocation);
 
 
+    Optional<Driver> findByUser(User user);
 }
