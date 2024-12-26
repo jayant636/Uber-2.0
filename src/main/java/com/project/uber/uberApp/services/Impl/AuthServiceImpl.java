@@ -1,5 +1,6 @@
 package com.project.uber.uberApp.services.Impl;
 
+import com.project.uber.uberApp.Security.JWTService;
 import com.project.uber.uberApp.dtos.DriverDto;
 import com.project.uber.uberApp.dtos.SignupDto;
 import com.project.uber.uberApp.dtos.UserDto;
@@ -15,6 +16,10 @@ import com.project.uber.uberApp.services.RiderService;
 import com.project.uber.uberApp.services.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +37,21 @@ public class AuthServiceImpl implements AuthService {
     private final RiderService riderService;
     private final WalletService walletService;
     private final DriverService driverService;
-
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
 
     @Override
-    public String login(String email, String password) {
-        return "";
+    public String[] login(String email, String password) {
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email,password)
+        );
+        User user = (User) authentication.getPrincipal();
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new String[]{accessToken,refreshToken};
     }
 
     @Override
@@ -55,6 +70,8 @@ public class AuthServiceImpl implements AuthService {
         User user = modelMapper.map(signupDto, User.class);
         //By default any user signedup as rider only
         user.setRoles(Set.of(Roles.RIDER));
+//        Encode the password before storing in db
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRespository.save(user);
 
         // Created user related entities
@@ -69,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public DriverDto onboardNewDriver(Long userId,String vehicleId) {
+    public DriverDto onboardNewDriver(Long userId, String vehicleId) {
         User user = userRespository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User with is id does not exists"+userId));
 
         if(user.getRoles().contains(DRIVER)){
